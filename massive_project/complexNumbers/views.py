@@ -37,7 +37,7 @@ class NumbersByIDView(APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('id')
         print(f"pk: {pk}")
-        if id is None:
+        if pk is None:
             return Response({"message": "Array not found"}, status=404)
 
         mass = NumberArray.objects.get(id=pk)
@@ -45,7 +45,8 @@ class NumbersByIDView(APIView):
         number_list = [str(x) for x in mass.numbers.split(',')]
         for number_id in number_list:
             complex_number = ComplexNumber.objects.get(id=number_id)
-            complex_in_mass.append(complex_number)
+            if complex_number.imaginary != 0:
+                complex_in_mass.append(complex_number)
 
         serializer = ComplexNumberSerializer(complex_in_mass, many=True)
         return Response(serializer.data, status=200)
@@ -64,4 +65,17 @@ class NumbersByIDView(APIView):
         mass.delete()
         return Response({
             "message": "Massive has been deleted."}, status=status.HTTP_200_OK)
+    # def delete(self, request, *args, **kwargs):
+    #     pk = kwargs.get('id')
+    #     print(f"pk: {pk}")
+    #     if pk is None or pk == '':
+    #         return Response({"message": "Array not found"}, status=status.HTTP_404_NOT_FOUND)
+    #     mass = NumberArray.objects.get(id=pk)
+    #     number_list = [str(x) for x in mass.numbers.split(',')]
+    #     for number_id in number_list:
+    #         complex_number = ComplexNumber.objects.get(id=number_id)
+    #         complex_number.delete()
+    #     mass.delete()
+    #     return Response({
+    #         "message": "Massive has been deleted."}, status=status.HTTP_200_OK)
 
